@@ -54,6 +54,8 @@ public class CircleMovement : MonoBehaviour
         BallPosition = transform.position;
         BlackHolePosition = blackhole.transform.position;
 
+        //pid();
+        //blackHolePid();
         blackHoleForce();
         moveBall();
         resetBall();
