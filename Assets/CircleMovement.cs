@@ -15,6 +15,7 @@ public class CircleMovement : MonoBehaviour
     UnityEngine.Vector3 BallPosition;
     public UnityEngine.Vector3 BallVelocity;
     public UnityEngine.Vector3 BallAccleration;
+    int maxVelocity = 15;
 
     //Mouse Variables
     UnityEngine.Vector3 MouseLocation;
@@ -27,9 +28,9 @@ public class CircleMovement : MonoBehaviour
     public float FroceStrength = 3000f;
 
     //Pid Variables
-    float Kp=0.01f;
-    float Ki=0.0005f;
-    float Kd=0.1f;
+    public float Kp=0.05f;
+    public float Ki=0.0005f;
+    public float Kd=0.5f;
     float ErrorX, ErrorY, PreviousErrorX, PreviousErrorY;
     float Ix,Dx,Iy,Dy;
 
@@ -54,11 +55,13 @@ public class CircleMovement : MonoBehaviour
         BallPosition = transform.position;
         BlackHolePosition = blackhole.transform.position;
 
-        blackHoleForce();
-        moveBall();
+        //blackHoleForce();
+        mousePid();
+        //blackHolePid();
+        //moveBall();
         resetBall();
-        updateVelocity();
-        maxVelocity();
+        //updateVelocity();
+        VelocityLimit();
 
         //Used to input the balls velocity
         transform.Translate(BallVelocity[0],BallVelocity[1],0f);
@@ -73,7 +76,7 @@ public class CircleMovement : MonoBehaviour
         BallVelocity[0] += BallAccleration[0];
         BallVelocity[1] += BallAccleration[1];
     }
-    public void pid()
+    public void mousePid()
     {
         ErrorX = MouseCamLocation[0]-BallPosition[0];
         ErrorY = MouseCamLocation[1]-BallPosition[1];
@@ -93,8 +96,8 @@ public class CircleMovement : MonoBehaviour
         Iy += ErrorY;
         Dx = ErrorX-PreviousErrorX;
         Dy = ErrorY-PreviousErrorY;
-        BallAccleration[0]=Kp*ErrorX + Ki*Ix + Kd*Dx;
-        BallAccleration[1]=Kp*ErrorY + Ki*Iy + Kd*Dy;
+        BallVelocity[0]=Kp*ErrorX + Ki*Ix + Kd*Dx;
+        BallVelocity[1]=Kp*ErrorY + Ki*Iy + Kd*Dy;
     }
 
     public void blackHoleForce()
@@ -105,8 +108,8 @@ public class CircleMovement : MonoBehaviour
         float force = FroceStrength/(Distance*Distance);
         float forcex = force*(X_Distance/Distance);
         float forcey = force*(Y_Distance/Distance);
-        BallAccleration[0]=forcex;
-        BallAccleration[1]=forcey;
+        BallVelocity[0]+=forcex;
+        BallVelocity[1]+=forcey;
     }
 
     public void moveBall()
@@ -143,23 +146,23 @@ public class CircleMovement : MonoBehaviour
         }
     }
 
-    public void maxVelocity()
+    public void VelocityLimit()
     {
-        if(BallVelocity[0]>15)
+        if(BallVelocity[0]>maxVelocity)
         {
-            BallVelocity[0]=15;
+            BallVelocity[0]=maxVelocity;
         }
-        if(BallVelocity[0]<-15)
+        if(BallVelocity[0]<-maxVelocity)
         {
-            BallVelocity[0]=-15;
+            BallVelocity[0]=-maxVelocity;
         }
-        if(BallVelocity[1]>15)
+        if(BallVelocity[1]>maxVelocity)
         {
-            BallVelocity[1]=15;
+            BallVelocity[1]=maxVelocity;
         }
-        if(BallVelocity[1]<-15)
+        if(BallVelocity[1]<-maxVelocity)
         {
-            BallVelocity[1]=-15;
+            BallVelocity[1]=-maxVelocity;
         }
     }
 
